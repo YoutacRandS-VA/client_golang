@@ -128,7 +128,7 @@ func rm2prom(d metrics.Description) string {
 func groupMetrics(metricsList []string) []metricGroup {
 	var groupedMetrics []metricGroup
 	for _, group := range metricGroups {
-		var matchedMetrics []string
+		matchedMetrics := make([]string, 0)
 		for _, metric := range metricsList {
 			if group.Regex == nil || group.Regex.MatchString(metric) {
 				matchedMetrics = append(matchedMetrics, metric)
@@ -148,13 +148,11 @@ func groupMetrics(metricsList []string) []metricGroup {
 			matchedMetrics = append(matchedMetrics, baseMatrices...)
 		}
 		sort.Strings(matchedMetrics)
-		if len(matchedMetrics) > 0 {
-			groupedMetrics = append(groupedMetrics, metricGroup{
-				Name:    group.Name,
-				Regex:   group.Regex,
-				Metrics: matchedMetrics,
-			})
-		}
+		groupedMetrics = append(groupedMetrics, metricGroup{
+			Name:    group.Name,
+			Regex:   group.Regex,
+			Metrics: matchedMetrics,
+		})
 	}
 	return groupedMetrics
 }
@@ -174,7 +172,7 @@ var testFile = template.Must(template.New("testFile").Funcs(map[string]interface
 		return (version + goVersion(1)).String()
 	},
 	"needsBaseMetrics": func(groupName string) bool {
-		return groupName == "withAllMetrics" || groupName == "withGCMetrics" || groupName == "withMemoryMetrics"
+		return groupName == "withAllMetrics" || groupName == "withGCMetrics" || groupName == "withMemoryMetrics" || groupName == "withDebugMetrics"
 	},
 }).Parse(`// Copyright 2022 The Prometheus Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
